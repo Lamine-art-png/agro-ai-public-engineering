@@ -1,0 +1,20 @@
+# Secrets and local configuration
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+terraform.tfvars
+*.tfstate
+*.tfstate.*
+
+# Local/editor artifacts
+.DS_Store
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+.coverage
