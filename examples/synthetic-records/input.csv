@@ -1,0 +1,4 @@
+record_id,asset_reference,source_type,observed_at,water_depth_in,quality_status,provenance
+SYN-001,FIELD-A01,meter_reading,2026-07-01T08:00:00Z,0.24,verified,synthetic
+SYN-002,FIELD-A02,staff_report,2026-07-01T09:15:00Z,0.31,review_required,synthetic
+SYN-003,FIELD-A03,meter_reading,2026-07-01T10:30:00Z,,missing_value,synthetic
