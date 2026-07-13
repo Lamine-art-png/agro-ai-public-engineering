@@ -1,0 +1,47 @@
+name: Public Repository Safety Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reject common sensitive file patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          forbidden='(^|/)(\.env($|\.)|terraform\.tfvars$|.*\.tfstate($|\.)|.*\.(pem|key|p12|pfx)$|credentials/|secrets/)'
+          if git ls-files | grep -E "$forbidden"; then
+            echo "Sensitive file pattern detected."
+            exit 1
+          fi
+
+      - name: Reject obvious credential material
+        shell: bash
+        run: |
+          set -euo pipefail
+          markers='BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|aws_secret_access_key[[:space:]]*=|client_secret[[:space:]]*=|password[[:space:]]*='
+          if git grep -niE "$markers" -- . ':!/.github/workflows/security-checks.yml'; then
+            echo "Credential-like material detected."
+            exit 1
+          fi
+
+      - name: Scan repository with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run public example tests
+        run: |
+          python3 -m unittest discover \
+            -s examples/record-quality-checker \
+            -p 'test_*.py'

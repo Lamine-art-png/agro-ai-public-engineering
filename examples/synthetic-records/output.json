@@ -1,0 +1,17 @@
+{
+  "dataset": "synthetic-public-example",
+  "summary": {
+    "records": 3,
+    "verified": 1,
+    "review_required": 1,
+    "exceptions": 1
+  },
+  "exceptions": [
+    {
+      "record_id": "SYN-003",
+      "issue": "water_depth_in is missing",
+      "recommended_public_example_action": "Route to human review"
+    }
+  ],
+  "disclaimer": "Illustrative output only; not a production recommendation or official determination."
+}
