@@ -15,6 +15,48 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Reject unapproved files in the public portfolio
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+
+          approved = set("""
+            .github/CODEOWNERS
+            .github/workflows/security-checks.yml
+            .gitignore
+            CODE_OF_CONDUCT.md
+            CONTRIBUTING.md
+            NOTICE.md
+            README.md
+            SECURITY.md
+            docs/architecture-overview.md
+            docs/public-disclosure-boundary.md
+            docs/security-and-governance.md
+            docs/selected-project-patterns.md
+            examples/record-quality-checker/README.md
+            examples/record-quality-checker/check_records.py
+            examples/record-quality-checker/test_check_records.py
+            examples/synthetic-records/README.md
+            examples/synthetic-records/input.csv
+            examples/synthetic-records/output.json
+          """.strip().splitlines())
+          approved = {item.strip() for item in approved}
+          tracked = set(
+              subprocess.check_output(["git", "ls-files", "-z"])
+              .decode("utf-8").strip("\x00").split("\x00")
+          )
+          unexpected = sorted(tracked - approved)
+          if unexpected:
+              raise SystemExit(
+                  "Unreviewed files found in the PUBLIC engineering portfolio. "
+                  "Review their disclosure risk before extending the explicit allowlist:\n"
+                  + "\n".join(unexpected)
+              )
+          print(f"Public release allowlist passed for {len(tracked)} tracked files.")
+          PY
+
       - name: Reject common sensitive file patterns
         shell: bash
         run: |
